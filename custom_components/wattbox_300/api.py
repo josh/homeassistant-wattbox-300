@@ -169,13 +169,40 @@ class WattBoxClient:
         if b"index.htm" not in body:
             raise InvalidResponse("Unexpected login response")
 
-    def fetch(self) -> PowerReading:
-        # Serializes cookies and login even when executor tasks overlap.
-        with self._lock:
+    def _fetch(self) -> PowerReading:
+        body = self._request("GET", "/wattbox_info.xml")
+        if _is_login(body):
+            self._login()
             body = self._request("GET", "/wattbox_info.xml")
             if _is_login(body):
-                self._login()
-                body = self._request("GET", "/wattbox_info.xml")
-                if _is_login(body):
-                    raise InvalidAuth("Session was not accepted after login")
-            return parse_reading(body)
+                raise InvalidAuth("Session was not accepted after login")
+        return parse_reading(body)
+
+    def fetch(self) -> PowerReading:
+        with self._lock:
+            return self._fetch()
+
+    def set_outlet(self, outlet: int, on: bool, expected_serial: str) -> PowerReading:
+        if type(outlet) is not int or not 1 <= outlet <= 5 or type(on) is not bool:
+            raise ValueError("Expected outlet 1–5 and an on/off boolean")
+        with self._lock:
+            reading = self._fetch()
+            if reading.serial != expected_serial:
+                raise InvalidResponse("The address belongs to a different WattBox")
+            state = reading.outlets[outlet - 1].is_on
+            if state is None:
+                raise InvalidResponse("Outlet state is unavailable")
+            if state == on:
+                return reading
+            # Never replay a command after an ambiguous response or timeout.
+            body = self._request(
+                "GET", f"/control.cgi?outlet={outlet}&command={int(on)}"
+            )
+            if _is_login(body):
+                raise InvalidAuth("Outlet command requires a new session")
+            reading = self._fetch()
+            if reading.serial != expected_serial:
+                raise InvalidResponse("The address belongs to a different WattBox")
+            if reading.outlets[outlet - 1].is_on != on:
+                raise InvalidResponse("Outlet did not report the requested state")
+            return reading

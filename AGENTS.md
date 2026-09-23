@@ -1,6 +1,6 @@
 # Development
 
-Read-only power sensors for WB-300VB-IP-5. Keep documentation minimal and never hard-wrap Markdown.
+Power sensors and individual outlet controls for WB-300VB-IP-5. Keep documentation minimal and never hard-wrap Markdown.
 
 ```sh
 uv sync
