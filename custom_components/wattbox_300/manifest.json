@@ -1,0 +1,14 @@
+{
+  "domain": "wattbox_300",
+  "name": "WattBox 300",
+  "codeowners": [
+    "@josh"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/josh/homeassistant-wattbox-300",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/josh/homeassistant-wattbox-300/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

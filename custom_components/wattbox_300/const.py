@@ -1,0 +1,4 @@
+DOMAIN = "wattbox_300"
+MODEL = "WB-300VB-IP-5"
+CONF_VERIFY_SSL = "verify_ssl"
+DEFAULT_SCAN_INTERVAL = 30

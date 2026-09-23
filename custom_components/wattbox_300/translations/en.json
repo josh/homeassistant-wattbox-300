@@ -1,0 +1,65 @@
+{
+  "title": "WattBox 300",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to WattBox 300",
+        "description": "Read-only power monitoring for WB-300VB-IP-5 over HTTPS. Certificate verification is off by default for the local device certificate.",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify TLS certificate",
+          "scan_interval": "Polling interval (seconds)"
+        }
+      },
+      "reconfigure": {
+        "title": "Connect to WattBox 300",
+        "description": "Read-only power monitoring for WB-300VB-IP-5 over HTTPS. Certificate verification is off by default for the local device certificate.",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify TLS certificate",
+          "scan_interval": "Polling interval (seconds)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Connect to WattBox 300",
+        "description": "Read-only power monitoring for WB-300VB-IP-5 over HTTPS. Certificate verification is off by default for the local device certificate.",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify TLS certificate",
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "invalid_host": "Enter an IPv4 address or hostname without a scheme or port.",
+      "invalid_auth": "The WattBox rejected the login.",
+      "unsupported_model": "Only WB-300VB-IP-5 is supported.",
+      "cannot_connect": "Unable to retrieve valid power readings. Check the address, HTTPS access, and certificate setting."
+    },
+    "abort": {
+      "already_configured": "This WattBox is already configured.",
+      "wrong_device": "The address belongs to a different WattBox.",
+      "reauth_successful": "Authentication updated.",
+      "reconfigure_successful": "Configuration updated."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "voltage": {
+        "name": "Voltage"
+      },
+      "current": {
+        "name": "Current"
+      },
+      "power": {
+        "name": "Power"
+      }
+    }
+  }
+}
