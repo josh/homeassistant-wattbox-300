@@ -10,15 +10,12 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3.15",
 ]
 
 [dependency-groups]
 dev = [
     "homeassistant>=2025.4",
     "mypy>=1.12,<2",
-    "pytest>=8,<10",
-    "pytest-asyncio>=0.24,<2",
     "ruff>=0.2,<2",
 ]
 
@@ -31,9 +28,3 @@ indent = 4
 [tool.mypy]
 explicit_package_bases = true
 strict = true
-
-[tool.pytest]
-ini_options.testpaths = [ "tests" ]
-ini_options.pythonpath = [ "." ]
-ini_options.asyncio_default_fixture_loop_scope = "function"
-ini_options.asyncio_mode = "auto"
