@@ -24,6 +24,7 @@ lint.extend-select = [ "I", "UP" ]
 
 [tool.pyproject-fmt]
 indent = 4
+max_supported_python = "3.14"
 
 [tool.mypy]
 explicit_package_bases = true
