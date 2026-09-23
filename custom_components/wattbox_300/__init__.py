@@ -5,7 +5,7 @@ from .api import WattBoxClient
 from .const import CONF_VERIFY_SSL
 from .coordinator import WattBoxConfigEntry, WattBoxCoordinator
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: WattBoxConfigEntry) -> bool:

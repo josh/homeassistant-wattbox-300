@@ -40,12 +40,19 @@ def validate_host(host: str) -> str:
 
 
 @dataclass(frozen=True)
+class OutletReading:
+    name: str
+    is_on: bool | None
+
+
+@dataclass(frozen=True)
 class PowerReading:
     serial: str
     model: str
     voltage: float
     current: float
     power: int
+    outlets: tuple[OutletReading, ...]
 
 
 def parse_reading(body: bytes) -> PowerReading:
@@ -69,7 +76,21 @@ def parse_reading(body: bytes) -> PowerReading:
         if not re.fullmatch(r"[0-9]{1,9}", value):
             raise InvalidResponse(f"Missing or invalid {tag}")
         values.append(int(value))
-    return PowerReading(serial, model, values[0] / 10, values[1] / 10, values[2])
+    names = (root.findtext("outlet_name") or "").split(",")
+    states = (root.findtext("outlet_status") or "").split(",")
+    outlets = tuple(
+        OutletReading(
+            name=(names[index].strip() if len(names) == 5 else "")
+            or f"Outlet {index + 1}",
+            is_on={"0": False, "1": True}.get(states[index].strip())
+            if len(states) == 5
+            else None,
+        )
+        for index in range(5)
+    )
+    return PowerReading(
+        serial, model, values[0] / 10, values[1] / 10, values[2], outlets
+    )
 
 
 def _is_login(body: bytes) -> bool:
