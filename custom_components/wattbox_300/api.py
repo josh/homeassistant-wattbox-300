@@ -1,9 +1,11 @@
 import re
 import ssl
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from http.client import HTTPException, HTTPSConnection, IncompleteRead
 from http.cookies import CookieError, SimpleCookie
 from threading import Lock
+from time import time_ns
 from urllib.parse import urlencode
 from xml.etree import ElementTree as ET
 
@@ -97,6 +99,27 @@ def _is_login(body: bytes) -> bool:
     return b"login.htm" in body or b"form_login" in body
 
 
+class _CSRFParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.token: str | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attributes = dict(attrs)
+        if tag == "input" and attributes.get("id") == "csrftoken":
+            self.token = attributes.get("value")
+
+
+def parse_csrf_token(body: bytes) -> str:
+    parser = _CSRFParser()
+    parser.feed(body.decode("utf-8", errors="replace"))
+    if not parser.token:
+        if _is_login(body):
+            raise InvalidAuth("Status page requires a new session")
+        raise InvalidResponse("Status page did not provide an outlet-control token")
+    return parser.token
+
+
 class WattBoxClient:
     def __init__(
         self, host: str, username: str, password: str, verify_ssl: bool = False
@@ -132,7 +155,9 @@ class WattBoxClient:
             if response.status in (401, 403):
                 raise InvalidAuth("Authentication rejected")
             if response.status != 200:
-                raise CannotConnect(f"Device returned HTTP {response.status}")
+                raise CannotConnect(
+                    f"Device returned HTTP {response.status} for {method} {path.split('?', 1)[0]}"
+                )
             for key, value in response.getheaders():
                 if key.lower() == "set-cookie":
                     self._cookies.load(value)
@@ -194,10 +219,17 @@ class WattBoxClient:
                 raise InvalidResponse("Outlet state is unavailable")
             if state == on:
                 return reading
-            # Never replay a command after an ambiguous response or timeout.
-            body = self._request(
-                "GET", f"/control.cgi?outlet={outlet}&command={int(on)}"
+            page = self._request("GET", "/Status.htm")
+            params = urlencode(
+                {
+                    "outlet": outlet,
+                    "command": int(on),
+                    "time": time_ns() // 1_000_000,
+                    "csrftoken": parse_csrf_token(page),
+                }
             )
+            # Match the web UI's session token; never replay an ambiguous command.
+            body = self._request("GET", f"/control.cgi?{params}")
             if _is_login(body):
                 raise InvalidAuth("Outlet command requires a new session")
             reading = self._fetch()

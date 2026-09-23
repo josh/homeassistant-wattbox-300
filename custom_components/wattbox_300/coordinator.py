@@ -58,7 +58,8 @@ class WattBoxCoordinator(DataUpdateCoordinator[PowerReading]):
             except WattBoxError as err:
                 self.async_set_update_error(UpdateFailed(str(err)))
                 raise HomeAssistantError(
-                    "Outlet command could not be verified; check its state before retrying"
+                    f"Outlet command could not be verified: {err}. "
+                    "Check its state before retrying"
                 ) from err
             self.async_set_updated_data(reading)
 
