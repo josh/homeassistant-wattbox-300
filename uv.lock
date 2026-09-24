@@ -1149,7 +1149,7 @@ wheels = [
 
 [[package]]
 name = "homeassistant-wattbox-300"
-version = "0.1.0"
+version = "2026.9.0"
 source = { virtual = "." }
 
 [package.dev-dependencies]
