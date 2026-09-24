@@ -16,7 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class WattBoxCoordinator(DataUpdateCoordinator[PowerReading]):
     def __init__(
-        self, hass: HomeAssistant, entry: "WattBoxConfigEntry", client: WattBoxClient
+        self, hass: HomeAssistant, entry: WattBoxConfigEntry, client: WattBoxClient
     ) -> None:
         super().__init__(
             hass,
