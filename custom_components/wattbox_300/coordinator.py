@@ -32,10 +32,6 @@ class WattBoxCoordinator(DataUpdateCoordinator[PowerReading]):
         self.client = client
         self.expected_serial = entry.unique_id
 
-    async def _async_update_data(self) -> PowerReading:
-        async with self._operation_lock:
-            return await self._async_fetch()
-
     async def _async_fetch(self) -> PowerReading:
         try:
             reading = await self.hass.async_add_executor_job(self.client.fetch)
@@ -46,6 +42,10 @@ class WattBoxCoordinator(DataUpdateCoordinator[PowerReading]):
         if reading.serial != self.expected_serial:
             raise UpdateFailed("The address now belongs to a different WattBox")
         return reading
+
+    async def _async_update_data(self) -> PowerReading:
+        async with self._operation_lock:
+            return await self._async_fetch()
 
     async def async_set_outlet(self, outlet: int, on: bool) -> None:
         if self.expected_serial is None:
