@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "schedule": ["* 0-3 15 * *"],
+  "rangeStrategy": "update-lockfile",
+  "postUpgradeTasks": {
+    "commands": ["sync-ha-python-version"],
+    "fileFilters": [".python-version"]
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["pyenv"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["homeassistant"],
+      "separateMajorMinor": false,
+      "assignees": ["merge-bot"]
+    }
+  ]
+}
